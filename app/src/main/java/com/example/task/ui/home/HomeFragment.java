@@ -16,14 +16,14 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.task.R;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import info.mqtt.android.service.MqttAndroidClient;
 
 public class HomeFragment extends Fragment {
 
@@ -32,7 +32,7 @@ public class HomeFragment extends Fragment {
     private TextView textViewStatus, textViewReceivedMessages;
     private EditText editTextTopic, editTextMessage;
     private Button buttonPublish;
-    private MqttViewModel mqttViewModel; // Fixed the type declaration
+    private MqttViewModel mqttViewModel;
 
     @Nullable
     @Override
@@ -40,6 +40,7 @@ public class HomeFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        // Initialize UI components
         textViewStatus = view.findViewById(R.id.textViewStatus);
         textViewReceivedMessages = view.findViewById(R.id.textViewReceivedMessages);
         editTextTopic = view.findViewById(R.id.editTextTopic);
@@ -86,8 +87,8 @@ public class HomeFragment extends Fragment {
                     Log.d(TAG, "Connection failed: " + exception.toString());
                 }
             });
-        } catch (MqttException e) {
-            e.printStackTrace();
+        } catch (Exception e) { // Change to catch a generic Exception
+            Log.e(TAG, "Exception while connecting: " + e.getMessage());
         }
 
         mqttClient.setCallback(new MqttCallback() {
@@ -110,7 +111,6 @@ public class HomeFragment extends Fragment {
                 Log.d(TAG, "Delivery complete");
             }
         });
-
     }
 
     private void subscribeToTopic(String topic) {
@@ -130,8 +130,8 @@ public class HomeFragment extends Fragment {
                     Log.d(TAG, "Subscription failed: " + exception.toString());
                 }
             });
-        } catch (MqttException e) {
-            e.printStackTrace();
+        } catch (Exception e) { // Change to catch a generic Exception
+            Log.e(TAG, "Exception while subscribing: " + e.getMessage());
         }
     }
 
@@ -141,15 +141,18 @@ public class HomeFragment extends Fragment {
             message.setPayload(payload.getBytes());
             mqttClient.publish(topic, message);
             Log.d(TAG, "Message published to topic: " + topic);
-        } catch (MqttException e) {
-            e.printStackTrace();
+        } catch (Exception e) { // Change to catch a generic Exception
+            Log.e(TAG, "Exception while publishing message: " + e.getMessage());
         }
     }
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mqttViewModel.disconnectClient(); // Disconnect using the ViewModel
+        if (mqttViewModel != null) {
+            mqttViewModel.disconnectClient(); // Disconnect using the ViewModel
+        }
     }
 
 }
