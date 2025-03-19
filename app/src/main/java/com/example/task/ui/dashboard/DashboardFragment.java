@@ -35,22 +35,7 @@ public class DashboardFragment extends Fragment {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textDashboard;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        OkHttpClient client = new OkHttpClient();
-        String url = "http://52.250.54.24:3500/api/node/";
-        Request getRequest=new Request.Builder().url(url).build();
-        client.newCall(getRequest).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                System.out.println(e.getMessage());
-            }
 
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                System.out.println(response.body().string());
-            }
-        });
 
         return root;
     }
